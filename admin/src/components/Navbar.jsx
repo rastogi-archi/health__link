@@ -19,7 +19,7 @@ const Navbar = () => {
   }
 
   const goToUserPanel = () => {
-    window.location.href = 'https://health-link-mauve.vercel.app/' // Change this to your frontend URL
+    window.location.href = 'https://health-link-klam.vercel.app' // Change this to your frontend URL
   }
 
   const isOnDashboard =
