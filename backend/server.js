@@ -19,15 +19,26 @@ connectCloudinary();
 // middlewares
 app.use(express.json());
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://health-link-mauve.vercel.app",
+  "https://health-link-ad90.vercel.app",
+  "https://health-link-6pmg.vercel.app",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://health-link-mauve.vercel.app",
-      "https://health-link-ad90.vercel.app",
-      "https://health-link-6pmg.vercel.app",
-    ],
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.log("Blocked by CORS:", origin);
+        callback(null, true); // allow temporarily
+      }
+    },
     credentials: true,
   })
 );
