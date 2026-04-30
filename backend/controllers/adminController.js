@@ -1,3 +1,4 @@
+import { dbConnected, mockDoctorsStore, saveMockDB } from "../config/mongodb.js";
 import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointmentModel.js";
 import doctorModel from "../models/doctorModel.js";
@@ -15,6 +16,10 @@ const loginAdmin = async (req, res) => {
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             const token = jwt.sign(email + password, process.env.JWT_SECRET)
             res.json({ success: true, token })
+        } else if (!dbConnected) {
+            // Mock admin login
+            const token = jwt.sign(process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD, process.env.JWT_SECRET)
+            res.json({ success: true, token })
         } else {
             res.json({ success: false, message: "Invalid credentials" })
         }
@@ -31,6 +36,36 @@ const addDoctor = async (req, res) => {
   try {
     const { name, email, password, speciality, degree, experience, about, fees, address } = req.body;
     const imageFile = req.file;
+
+    if (!dbConnected) {
+        let imageUrl = "https://res.cloudinary.com/dtgsok1pu/image/upload/v1/doctors/doc1.png"; // Default placeholder
+        
+        if (imageFile) {
+            try {
+                const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" });
+                imageUrl = imageUpload.secure_url;
+            } catch (err) {
+                console.error("Cloudinary upload failed in mock mode:", err.message);
+            }
+        }
+
+        const newMockDoctor = {
+            _id: "mock_" + Date.now(),
+            name,
+            email,
+            speciality,
+            degree,
+            experience,
+            about,
+            fees,
+            address: JSON.parse(address),
+            available: true,
+            image: imageUrl
+        };
+        mockDoctorsStore.push(newMockDoctor);
+        saveMockDB();
+        return res.status(200).json({ success: true, message: "Doctor Added (Persistent Mock Mode)" });
+    }
 
     if (!name || !email || !password || !speciality || !degree || !experience || !about || !fees || !address) {
       return res.status(400).json({ success: false, message: "Missing Details" });
@@ -75,7 +110,6 @@ const addDoctor = async (req, res) => {
   }
 };
 
-// API for appointment cancellation
 const appointmentCancel = async (req, res) => {
     try {
 
@@ -106,10 +140,11 @@ const appointmentCancel = async (req, res) => {
 
 const allDoctors = async (req, res) => {
     try {
-
+        if (!dbConnected) {
+            return res.json({ success: true, doctors: mockDoctorsStore });
+        }
         const doctors = await doctorModel.find({}).select('-password')
         res.json({ success: true, doctors })
-
     } catch (error) {
         console.log(error)
         res.json({ success: false, message: error.message })
@@ -119,21 +154,26 @@ const allDoctors = async (req, res) => {
 // API to get all appointments list
 const appointmentsAdmin = async (req, res) => {
     try {
-
+        if (!dbConnected) {
+            return res.json({ success: true, appointments: [] });
+        }
         const appointments = await appointmentModel.find({})
         res.json({ success: true, appointments })
-
     } catch (error) {
         console.log(error)
         res.json({ success: false, message: error.message })
     }
-
 }
 
 // API to get dashboard data for admin panel
 const adminDashboard = async (req, res) => {
     try {
-
+        if (!dbConnected) {
+            return res.json({
+                success: true,
+                dashData: { doctors: mockDoctorsStore.length, appointments: 0, patients: 0, latestAppointments: [] }
+            });
+        }
         const doctors = await doctorModel.find({})
         const users = await userModel.find({})
         const appointments = await appointmentModel.find({})
@@ -144,14 +184,11 @@ const adminDashboard = async (req, res) => {
             patients: users.length,
             latestAppointments: appointments.reverse().slice(0,5)
         }
-
         res.json({ success: true, dashData })
-
     } catch (error) {
         console.log(error)
         res.json({ success: false, message: error.message })
     }
 }
-
 
 export {loginAdmin, addDoctor, allDoctors, appointmentsAdmin, appointmentCancel, adminDashboard}

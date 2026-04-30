@@ -1,0 +1,48 @@
+[
+  {
+    "_id": "mock1",
+    "name": "Dr. Richard James",
+    "image": "https://res.cloudinary.com/dtgsok1pu/image/upload/v1/doctors/doc1.png",
+    "speciality": "General physician",
+    "degree": "MBBS",
+    "experience": "4 Years",
+    "about": "Dr. Richard has a strong commitment to delivering comprehensive medical care.",
+    "fees": 50,
+    "address": {
+      "line1": "17th Cross, Richmond",
+      "line2": "Circle, Ring Road"
+    },
+    "available": true
+  },
+  {
+    "_id": "mock_1777560071604",
+    "name": "hanuman ji",
+    "speciality": "General physician",
+    "degree": "mbbs",
+    "experience": "1 Year",
+    "about": "hello",
+    "fees": "88",
+    "address": {
+      "line1": "c501",
+      "line2": "ansal tanushree"
+    },
+    "available": true,
+    "image": "https://res.cloudinary.com/dtgsok1pu/image/upload/v1/doctors/doc1.png"
+  },
+  {
+    "_id": "mock_1777560208280",
+    "name": "haaaa",
+    "email": "admin@healthlink.com",
+    "speciality": "General physician",
+    "degree": "mbbs",
+    "experience": "1 Year",
+    "about": "xdfcgvhb",
+    "fees": "875",
+    "address": {
+      "line1": "uihn",
+      "line2": "dxfcvgbh"
+    },
+    "available": true,
+    "image": "https://res.cloudinary.com/dtgsok1pu/image/upload/v1777560207/cw8rzb2v9p8wg4bsw86t.png"
+  }
+]

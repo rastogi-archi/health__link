@@ -1,3 +1,4 @@
+import { dbConnected, mockDoctorsStore } from "../config/mongodb.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import doctorModel from "../models/doctorModel.js";
@@ -89,23 +90,15 @@ const appointmentComplete = async (req, res) => {
 
 const doctorList = async (req, res) => {
   try {
-    console.log("Fetching doctors...");
+    if (!dbConnected) {
+      return res.json({ success: true, doctors: mockDoctorsStore });
+    }
 
-    const doctors = await doctorModel
-      .find({})
-      .select("-password -email");
-
-    console.log("Doctors count:", doctors.length);
-
+    const doctors = await doctorModel.find({}).select("-password -email");
     res.json({ success: true, doctors });
-
   } catch (error) {
     console.error("Doctor list error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
