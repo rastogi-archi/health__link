@@ -1,4 +1,3 @@
-import { dbConnected, mockDoctorsStore } from "../config/mongodb.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import doctorModel from "../models/doctorModel.js";
@@ -77,23 +76,8 @@ const appointmentComplete = async (req, res) => {
   }
 };
 
-// Get all doctors (for frontend list)
-// const doctorList = async (req, res) => {
-//   try {
-//     const doctors = await doctorModel.find({}).select("-password -email");
-//     res.json({ success: true, doctors });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
 const doctorList = async (req, res) => {
   try {
-    if (!dbConnected) {
-      return res.json({ success: true, doctors: mockDoctorsStore });
-    }
-
     const doctors = await doctorModel.find({}).select("-password -email");
     res.json({ success: true, doctors });
   } catch (error) {
@@ -103,7 +87,7 @@ const doctorList = async (req, res) => {
 };
 
 // Toggle doctor's availability
-  const changeAvailability = async (req, res) => {
+const changeAvailability = async (req, res) => {
   try {
     const { docId } = req.body;
 
@@ -144,13 +128,13 @@ const doctorProfile = async (req, res) => {
 const updateDoctorProfile = async (req, res) => {
   try {
     const docId = req.user.id;
-    const { fees, address, available, about } = req.body; // ✅ include `about`
+    const { fees, address, available, about } = req.body;
 
     await doctorModel.findByIdAndUpdate(docId, {
       fees,
       address,
       available,
-      about, // ✅ update `about`
+      about,
     });
 
     res.json({ success: true, message: "Profile Updated" });

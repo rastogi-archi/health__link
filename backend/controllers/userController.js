@@ -1,4 +1,3 @@
-import { dbConnected } from '../config/mongodb.js'
 import validator from 'validator'
 import bcrypt from 'bcrypt'
 import userModel from "../models/userModel.js";
@@ -29,12 +28,6 @@ const registerUser = async (req, res) => {
             return res.json({ success: false, message: "Please enter a strong password" })
         }
 
-        if (!dbConnected) {
-            // Mock registration: return a valid formatted JWT with a valid-looking ObjectId
-            const token = jwt.sign({ id: "507f1f77bcf86cd799439011" }, process.env.JWT_SECRET);
-            return res.json({ success: true, token });
-        }
-
         // hashing user password
         const salt = await bcrypt.genSalt(10); // the more no. round the more time it will take
         const hashedPassword = await bcrypt.hash(password, salt)
@@ -62,13 +55,6 @@ const loginUser = async (req, res) => {
 
     try {
         const { email, password } = req.body;
-
-        if (!dbConnected) {
-            // Mock registration: return a valid formatted JWT with a valid-looking ObjectId
-            const token = jwt.sign({ id: "507f1f77bcf86cd799439011" }, process.env.JWT_SECRET);
-            return res.json({ success: true, token });
-        }
-
         const user = await userModel.findOne({ email })
 
         if (!user) {
@@ -94,18 +80,6 @@ const loginUser = async (req, res) => {
 const getProfile = async (req, res) => {
 
     try {
-        if (!dbConnected) {
-            const mockUserData = {
-                name: "Mock User",
-                email: "user@example.com",
-                phone: "0000000000",
-                address: { line1: "Mock Street", line2: "Mock City" },
-                gender: "Not Selected",
-                dob: "2000-01-01",
-                image: "https://res.cloudinary.com/dtgsok1pu/image/upload/v1/users/user_default.png"
-            };
-            return res.json({ success: true, userData: mockUserData });
-        }
         const { userId } = req.body
         const userData = await userModel.findById(userId).select('-password')
 
@@ -152,9 +126,7 @@ const updateProfile = async (req, res) => {
 const bookAppointment = async (req, res) => {
 
     try {
-        if (!dbConnected) {
-            return res.json({ success: true, message: 'Appointment Booked (Mock Mode)' })
-        }
+
         const { userId, docId, slotDate, slotTime } = req.body
         const docData = await doctorModel.findById(docId).select("-password")
 
@@ -243,27 +215,7 @@ const cancelAppointment = async (req, res) => {
 // API to get user appointments for frontend my-appointments page
 const listAppointment = async (req, res) => {
     try {
-        if (!dbConnected) {
-            const mockAppointments = [
-                {
-                    _id: "mockApp1",
-                    docId: "mock1",
-                    docData: { 
-                        name: "Dr. Richard James", 
-                        speciality: "General physician",
-                        image: "https://res.cloudinary.com/dtgsok1pu/image/upload/v1/doctors/doc1.png",
-                        address: { line1: "17th Cross, Richmond", line2: "Circle, Ring Road" }
-                    },
-                    slotDate: "01_05_2024",
-                    slotTime: "10:00 AM",
-                    amount: 50,
-                    cancelled: false,
-                    payment: false,
-                    isCompleted: false
-                }
-            ];
-            return res.json({ success: true, appointments: mockAppointments });
-        }
+
         const { userId } = req.body
         const appointments = await appointmentModel.find({ userId })
 
