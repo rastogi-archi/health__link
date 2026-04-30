@@ -22,9 +22,9 @@ app.use(express.json());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "https://health-link-klam.vercel.app/",
-  "https://health-link-zbvg.vercel.app/",
-  "https://health-link-chi.vercel.app/"
+  "https://health-link-klam.vercel.app",
+  "https://health-link-zbvg.vercel.app",
+  "https://health-link-chi.vercel.app"
 ];
 
 app.use(
